@@ -1,3 +1,0 @@
-@echo off
-echo Waiting for the client...
-java -jar ghitss.jar
