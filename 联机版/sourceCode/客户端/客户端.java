@@ -1,12 +1,10 @@
 import java.util.Scanner;
-public class Ghit_main {
+public class 客户端 {
 	public static Scanner cin=new Scanner(System.in);
     public static void main(String[] args){
     	try {
-			new DrawSee("map.hg");
+			new DrawSee();
 		} catch (Exception e) {
-			System.out.print("按Enter键退出...");
-			cin.nextLine();
 		}
     }
 }

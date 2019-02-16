@@ -4,19 +4,18 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-public class SocketService {
+public class Player {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter writer;
-    public SocketService(ServerSocket server){
-        try{
-            socket=server.accept();
-            in=new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            writer=new PrintWriter(socket.getOutputStream());
-            System.out.println("服务器启动成功");
-        }catch(Exception e) {
-            System.out.println("没有启动监听："+e);
-        }
+    private static int allCount=0;
+    private int cnt;
+    public Player(ServerSocket server) throws IOException{
+    	cnt=++allCount;
+        socket=server.accept();
+        in=new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        writer=new PrintWriter(socket.getOutputStream());
+    	System.out.println("Player "+cnt+" connected");
     }
     public String readLine() {
     	if(socket.isClosed())return null;
@@ -38,5 +37,8 @@ public class SocketService {
 			// TODO 自动生成的 catch 块
 			e.printStackTrace();
 		}
+    }
+    public int getCnt() {
+    	return cnt;
     }
 }

@@ -17,11 +17,20 @@ import java.net.Socket;
 import java.util.Scanner;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 class SocketService {
     public SocketService(String ss) throws Exception{
-    	oneServer(ss);
+        try{
+        	socket = new Socket(ss,5209);
+            System.out.println("客户端启动成功");
+            writer = new PrintWriter(socket.getOutputStream());
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        }catch(Exception e) {
+			JOptionPane.showMessageDialog(null, "无法连接服务端","连接错误",JOptionPane.ERROR_MESSAGE);
+            throw e;
+        }
     }
     public String readLine() {
     	try {
@@ -40,24 +49,14 @@ class SocketService {
     Socket socket;
     BufferedReader in;
     PrintWriter writer;
-    public  void oneServer(String ss) throws Exception{
-        try{
-        	socket = new Socket(ss,5209);
-            System.out.println("客户端启动成功");
-            writer = new PrintWriter(socket.getOutputStream());
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        }catch(Exception e) {
-            throw e;
-        }
-    }
 }
 public class DrawSee extends JFrame implements KeyListener{
 	private static final long serialVersionUID = 1211111L;
 	MyPanel mp;
     private Color rectColor = new Color(255,255,255);
-    public DrawSee(String s) throws Exception{
+    public DrawSee() throws Exception{
     	Container p = getContentPane();
-    	mp=new MyPanel(s);
+    	mp=new MyPanel();
     	this.add(mp);
     	this.addKeyListener(this);
     	setBounds(100, 100, 800, 600);
@@ -101,6 +100,9 @@ class MyPanel extends JPanel{
 	private boolean win,lost,dwin,dlost,dwait,hbg;
 	private boolean fdd[];
 	public void kr(char c) {
+		if(c<0||c>300) {
+			return;
+		}
     	if(c>='A'&&c<='Z') {
     		c-='A';
     		c+='a';
@@ -108,6 +110,9 @@ class MyPanel extends JPanel{
 		fdd[c]=false;
 	}
 	public void kp(char c) {
+		if(c<0||c>300) {
+			return;
+		}
     	if(c>='A'&&c<='Z') {
     		c-='A';
     		c+='a';
@@ -336,22 +341,26 @@ class MyPanel extends JPanel{
 	    	}
 		}
 	}
-    @SuppressWarnings("resource")
-	public MyPanel(String s) throws Exception{
+    private String getServiceIP() throws FileNotFoundException {
     	Scanner fin;
     	try {
-			fin=new Scanner(new File("./"+s));
+			fin=new Scanner(new File("./data/serv.ini"));
 		} catch (FileNotFoundException e) {
-			System.out.println("应用找不到关键文件。");
+			JOptionPane.showMessageDialog(null, "找不到关键文件serv.ini。","文件缺失",JOptionPane.ERROR_MESSAGE);
 			throw e;
 		}
-		try {
-			ss=new SocketService("10.176.20.52");
-		}catch(Exception e){
-	    	System.out.println("Error:连接失败");
+    	final String ans=fin.next();
+    	fin.close();
+    	return ans;
+    }
+    private void getMapData() throws FileNotFoundException {
+    	Scanner fin;
+    	try {
+			fin=new Scanner(new File("./data/map.hg"));
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "找不到关键文件map.hg。","文件缺失",JOptionPane.ERROR_MESSAGE);
 			throw e;
 		}
-		this.new PeekMSG().start();
     	n=fin.nextInt();
     	m=fin.nextInt();
     	k=fin.nextInt();
@@ -361,11 +370,6 @@ class MyPanel extends JPanel{
     			a[i][j]=fin.nextInt();
     		}
     	}
-    	win=false;
-    	lost=false;
-    	dwait=false;
-    	hbg=false;
-		fq=0;
 		fdd=new boolean[303];
 		if(fin.hasNextInt()) {
 			opx=fin.nextInt();
@@ -378,9 +382,23 @@ class MyPanel extends JPanel{
 			edx=1;
 			edy=m;
 		}
+		fin.close();
+    }
+    private void initGameData() {
+    	win=false;
+    	lost=false;
+    	dwait=false;
+    	hbg=false;
+		fq=0;
     	rx=opx;
     	ry=opy;
     	drx=opx;
     	dry=opy;
+    }
+	public MyPanel() throws Exception{
+		getMapData();
+		initGameData();
+		ss=new SocketService(getServiceIP());
+		this.new PeekMSG().start();
 	}
 }
