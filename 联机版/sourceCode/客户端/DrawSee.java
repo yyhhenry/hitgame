@@ -344,7 +344,7 @@ class MyPanel extends JPanel{
     private String getServiceIP() throws FileNotFoundException {
     	Scanner fin;
     	try {
-			fin=new Scanner(new File("./data/serv.ini"));
+			fin=new Scanner(new File("./data/serv.ini"),"utf-8");
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "找不到关键文件serv.ini。","文件缺失",JOptionPane.ERROR_MESSAGE);
 			throw e;
@@ -356,7 +356,7 @@ class MyPanel extends JPanel{
     private void getMapData() throws FileNotFoundException {
     	Scanner fin;
     	try {
-			fin=new Scanner(new File("./data/map.hg"));
+			fin=new Scanner(new File("./data/map.hg"),"utf-8");
 		} catch (FileNotFoundException e) {
 			JOptionPane.showMessageDialog(null, "找不到关键文件map.hg。","文件缺失",JOptionPane.ERROR_MESSAGE);
 			throw e;
